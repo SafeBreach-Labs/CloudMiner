@@ -1,4 +1,3 @@
-import json
 import time
 import requests
 from http import HTTPStatus
@@ -43,8 +42,12 @@ class AzureAutomationSession:
         except requests.HTTPError as e:
             if e.response.status_code == HTTPStatus.UNAUTHORIZED:
                 raise CloudMinerException(f"Access token provided is not valid")
-            if e.response.status_code == HTTPStatus.NOT_FOUND:
+            elif e.response.status_code == HTTPStatus.BAD_REQUEST:
+                raise CloudMinerException(f"ID provided is not valid")
+            elif e.response.status_code == HTTPStatus.NOT_FOUND:
                 raise CloudMinerException(f"Automation Account does not exists - '{account_id}'")
+            else:
+                raise
 
     def _wait_for_next_request(self):
         """
@@ -66,6 +69,14 @@ class AzureAutomationSession:
                 **kwargs) -> requests.Response:
         """
         Safe HTTP request to Azure services
+
+        :param http_method:   HTTP method of the request
+        :param url:           URL of the request
+        :param headers:       Headers of the request
+        :param authorization: If True, set the 'Authorization' header
+        :param retries:       Retries count on a bad server response
+
+        Return the response object
         """
         self._wait_for_next_request()
         if authorization:
@@ -83,11 +94,9 @@ class AzureAutomationSession:
                                                         HTTPStatus.GATEWAY_TIMEOUT, 
                                                         HTTPStatus.SERVICE_UNAVAILABLE]:
                     
-                    print(resp)
                     logger.warning(f"Too many requests. Retrying in {SLEEP_BETWEEN_ERROR} seconds...")
                     time.sleep(SLEEP_BETWEEN_ERROR)
                     retries -= 1
-
                 else:
                     break
 
@@ -151,6 +160,8 @@ class AzureAutomationSession:
         except requests.HTTPError as e:
             if e.response.status_code == HTTPStatus.NOT_FOUND:
                 return None
+            else:
+                raise
             
         return package_data
     
