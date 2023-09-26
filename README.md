@@ -1,5 +1,5 @@
 # CloudMiner
-Execute code using Azure Automation service without getting charged
+Execute code within Azure Automation service without getting charged
 
 ## Description
 CloudMiner is a tool designed to get free computing power within Azure Automation service. The tool utilizes the upload module/package flow to execute code which is totally free to use. This tool is intended for educational and research purposes only and should be used responsibly and with proper authorization.
