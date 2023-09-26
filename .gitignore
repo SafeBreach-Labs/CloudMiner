@@ -3,5 +3,5 @@ __pycache__
 **venv**
 **dist**
 **build**
-**pip.egg-info**
-resources/custom_pip/src/pip/main.py
+**egg-info**
+resources/pip/src/pip/main.py
