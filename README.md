@@ -26,9 +26,12 @@ CloudMiner - Free computing power in Azure Automation Service
 optional arguments:
   -h, --help            show this help message and exit
   --path PATH           the script path (Powershell or Python)
-  --id ID               id of the Automation account - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}
+  --id ID               id of the Automation Account - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}
   -c COUNT, --count COUNT
                         number of executions
+  -t TOKEN, --token TOKEN
+                        Azure access token
+  -v, --verbose         Enable verbose mode
 ```
 
 ## License
