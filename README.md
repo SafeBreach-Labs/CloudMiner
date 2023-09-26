@@ -19,7 +19,7 @@ CloudMiner is a tool designed to get free computing power within Azure Automatio
 ```
 -- CloudMiner: v1.0.0 (SafeBreach Labs) --
 
-usage: cloudminer.py command [options]
+usage: cloud_miner.py [-h] --path PATH --id ID -c COUNT [-t TOKEN] [-v]
 
 CloudMiner - Free computing power in Azure Automation Service
 
