@@ -44,7 +44,6 @@ class PowershellScriptExecutor(ScriptExecutor):
                 blob_storage_uri = self.automation_session.upload_file_to_temp_storage(zipped_module_path)
                 self.automation_session.upload_powershell_module(module_name, blob_storage_uri)
                 logger.debug(f"Waiting for code execution...")
-                time.sleep(0.1)
 
 
 class PythonScriptExecutor(ScriptExecutor):
@@ -105,4 +104,3 @@ class PythonScriptExecutor(ScriptExecutor):
                 blob_storage_uri = self.automation_session.upload_file_to_temp_storage(whl_path)
                 self.automation_session.upload_python_package(package_name, blob_storage_uri)
                 logger.debug(f"Waiting for code execution...")
-                time.sleep(0.1)

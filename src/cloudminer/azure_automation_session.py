@@ -9,8 +9,8 @@ from cloudminer import CloudMinerException
 URL_GET_STORAGE_BLOB = "https://s2.automation.ext.azure.com/api/Orchestrator/GenerateSasLinkUri?accountId=%s&assetType=Module"
 AUTOMATION_ACCOUNT_URL = "https://management.azure.com%s/?api-version=2018-06-30"
 UPLOAD_TIMEOUT = 300
-SLEEP_BETWEEN_ERROR = 10
-TIME_BETWEEN_REQUESTS = 0.5
+SLEEP_BETWEEN_ERROR_SECONDS = 10
+TIME_BETWEEN_REQUESTS_SECONDS = 0.5
 
 class UPLOAD_STATE:
     """
@@ -58,7 +58,7 @@ class AzureAutomationSession:
         if time_gap > 0:
             time.sleep(time_gap)
 
-        self.next_request_time = time.time() + TIME_BETWEEN_REQUESTS
+        self.next_request_time = time.time() + TIME_BETWEEN_REQUESTS_SECONDS
 
     def http_request(self,
                 http_method: str,
@@ -94,8 +94,8 @@ class AzureAutomationSession:
                                                         HTTPStatus.GATEWAY_TIMEOUT, 
                                                         HTTPStatus.SERVICE_UNAVAILABLE]:
                     
-                    logger.warning(f"Too many requests. Retrying in {SLEEP_BETWEEN_ERROR} seconds...")
-                    time.sleep(SLEEP_BETWEEN_ERROR)
+                    logger.warning(f"Too many requests. Retrying in {SLEEP_BETWEEN_ERROR_SECONDS} seconds...")
+                    time.sleep(SLEEP_BETWEEN_ERROR_SECONDS)
                     retries -= 1
                 else:
                     break

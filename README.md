@@ -10,7 +10,8 @@ CloudMiner is a tool designed to get free computing power within Azure Automatio
 
 ## Requirements
 1. Python 3.8+ with the libraries mentioned in the file `requirements.txt`
-2. Azure CLI - https://learn.microsoft.com/en-us/cli/azure/install-azure-cli
+2. Configured Azure CLI - https://learn.microsoft.com/en-us/cli/azure/install-azure-cli
+    - Account must be logged in before using this tool
 
 ## Installation
 ```pip install .```

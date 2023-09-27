@@ -16,6 +16,16 @@ def get_access_token() -> str:
     """
     logger.debug("Retrieving access token using Azure CLI...")
     try:
+        # Check if user is logged in
+        process = subprocess.run(["az", "account", "show"],
+                                 shell=True,
+                                 text=True,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE)
+        
+        if process.returncode != 0:
+            raise CloudMinerException(f"Account must be logged in via Azure CLI")
+        
         process = subprocess.run(["az", "account", "get-access-token"],
                                  shell=True,
                                  text=True,
@@ -26,7 +36,7 @@ def get_access_token() -> str:
             raise CloudMinerException(f"Failed to get access token using Azure CLI. Error - {process.stderr}")
          
     except FileNotFoundError:
-        raise CloudMinerException("Azure CLI is not installed on the system.")
+        raise CloudMinerException("Azure CLI is not installed on the system or not in PATH.")
 
     return json.loads(process.stdout)["accessToken"]
     
@@ -36,7 +46,7 @@ def main():
     parser.add_argument("--path", type=str, help="the script path (Powershell or Python)", required=True)
     parser.add_argument("--id", type=str, help="id of the Automation Account - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}", required=True)
     parser.add_argument("-c","--count", type=int, help="number of executions", required=True)
-    parser.add_argument("-t","--token", type=int, help="Azure access token (optional)")
+    parser.add_argument("-t","--token", type=int, help="Azure access token (optional). If not provided, token will be retrieved using the Azure CLI")
     parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose mode')
     args = parser.parse_args()
     
