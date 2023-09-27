@@ -36,14 +36,14 @@ class PowershellScriptExecutor(ScriptExecutor):
         Executes Powershell script within Azure Automation
         """
         logger.info(f"Attempting to execute the Powershell script {count} times:")
-        with LoggerIndent(logger):
-            for index in range(count):
-                logger.info(f"Triggering Powershell execution - {index+1}/{count}:")
+        for index in range(count):
+            logger.info(f"Triggering Powershell execution - {index+1}/{count}:")
+            with LoggerIndent(logger):
                 module_name = str(uuid.uuid4())
                 zipped_module_path = file_utils.zip_file(script_path, f"{module_name}.psm1")
                 blob_storage_uri = self.automation_session.upload_file_to_temp_storage(zipped_module_path)
                 self.automation_session.upload_powershell_module(module_name, blob_storage_uri)
-                logger.debug(f"Waiting for code execution...")
+                logger.debug("Waiting for code execution...")
 
 
 class PythonScriptExecutor(ScriptExecutor):
@@ -51,20 +51,28 @@ class PythonScriptExecutor(ScriptExecutor):
     EXTENSION = ".py"
     NAME = "Python"
     PIP_PACKAGE_NAME = "pip"
+    UPLOAD_STATE_CHECK_INTERVAL_SECONDS = 15
 
     def __init__(self, automation_session: AzureAutomationSession) -> None:
         super().__init__(automation_session)
 
     def _wait_for_package_upload(self, package_name: str, timeout_seconds: int = UPLOAD_TIMEOUT):
         """
-        Blocking until the package upload flow is finished or until timeout
+        Wait until the package upload flow is finished or until timeout (Blocking)
+
+        :param package_name: Python package name to wait for
+        :param timeout_seconds: Maximum time to wait for the upload
+
+        :raises CloudMinerException: If the upload flow has not started for the given package
+                                     If upload flow has finished with an error
+                                     If timeout is reached
         """
         end_time = time.time() + timeout_seconds
         with LoggerIndent(logger):
             while time.time() < end_time:
                 package_data = self.automation_session.get_python_package(package_name)
                 if not package_data:
-                    raise CloudMinerException(f"Package {package_name} has failed to be created")
+                    raise CloudMinerException(f"Upload flow for package {package_name} has failed to be started")
                 
                 upload_state = package_data["properties"]["provisioningState"]         
                 if upload_state == UPLOAD_STATE.SUCCEEDED:
@@ -74,7 +82,7 @@ class PythonScriptExecutor(ScriptExecutor):
                     raise CloudMinerException("Python package upload failed. Error: ", error)
                 else:
                     logger.debug(f"Upload state - '{upload_state}'")
-                    time.sleep(15)
+                    time.sleep(PythonScriptExecutor.UPLOAD_STATE_CHECK_INTERVAL_SECONDS)
             else:
                 raise CloudMinerException("Python package upload failed due to timeout")
         
@@ -97,9 +105,9 @@ class PythonScriptExecutor(ScriptExecutor):
 
         logger.info("Successfully replaced the pip package!")
         logger.info(f"Attempting to execute the Python script {count} times:")
-        with LoggerIndent(logger):
-            for index in range(count):
-                logger.info(f"Triggering Python execution - {index+1}/{count}:")
+        for index in range(count):
+            logger.info(f"Triggering Python execution - {index+1}/{count}:")
+            with LoggerIndent(logger):
                 package_name = str(uuid.uuid4())
                 blob_storage_uri = self.automation_session.upload_file_to_temp_storage(whl_path)
                 self.automation_session.upload_python_package(package_name, blob_storage_uri)

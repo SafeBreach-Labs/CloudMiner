@@ -19,14 +19,14 @@ def get_temp_file_path(file_name: str) -> str:
 
 def get_file_extension(file_path: str):
     """
-    Get file extension from file path
+    Returns the file extension from file path
     """
     return os.path.basename(os.path.splitext(file_path)[1])
 
 
 def get_file_name(file_path: str):
     """
-    Get file name from full file path
+    Returns the file name from full file path
     """
     return os.path.basename(os.path.splitext(file_path)[0])
 
@@ -38,6 +38,8 @@ def zip_file(source_file: str, file_name_within_archive: str = None, zip_path: s
     :param source_file: file path to zip
     :param file_name_within_archive: name of file within the zip archive
     :param zip_path: path to the zipped file
+    
+    :return: zip file path
     """
     src_file_name = get_file_name(source_file)
     if zip_path is None:
@@ -52,10 +54,14 @@ def zip_file(source_file: str, file_name_within_archive: str = None, zip_path: s
     return zip_path
 
 
-def package_to_whl(package_path: str):
+def package_to_whl(package_path: str) -> str:
     """
     Create a whl file from a given Python package
         whl file wil lbe saved in the dist directory
+
+    :raises CloudMinerException: If failed to create whl file
+    
+    :return: whl file path
     """
     package_name = os.path.basename(package_path)
     setup_file = os.path.join(package_path, "setup.py")

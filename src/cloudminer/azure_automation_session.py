@@ -32,6 +32,10 @@ class AzureAutomationSession:
 
         :param account_id: Automation account ID - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}
         :param access_token: Azure access token
+
+        :raises CloudMinerException: If access token proivided is not valid
+                                     If Automation Account ID is not valid
+                                     If Automation Account provided does not exist
         """
         self.account_id = account_id
         self.access_token = access_token
@@ -41,11 +45,11 @@ class AzureAutomationSession:
             logger.info("Access token is valid")
         except requests.HTTPError as e:
             if e.response.status_code == HTTPStatus.UNAUTHORIZED:
-                raise CloudMinerException(f"Access token provided is not valid")
+                raise CloudMinerException(f"Access token provided is not valid") from e
             elif e.response.status_code == HTTPStatus.BAD_REQUEST:
-                raise CloudMinerException(f"ID provided is not valid")
+                raise CloudMinerException(f"Automation Account ID provided is not valid") from e
             elif e.response.status_code == HTTPStatus.NOT_FOUND:
-                raise CloudMinerException(f"Automation Account does not exists - '{account_id}'")
+                raise CloudMinerException(f"Automation Account does not exists - '{account_id}'") from e
             else:
                 raise
 
@@ -75,8 +79,9 @@ class AzureAutomationSession:
         :param headers:       Headers of the request
         :param authorization: If True, set the 'Authorization' header
         :param retries:       Retries count on a bad server response
+        :return:              Response object
 
-        Return the response object
+        :raises HTTPError: If bad response is received
         """
         self._wait_for_next_request()
         if authorization:

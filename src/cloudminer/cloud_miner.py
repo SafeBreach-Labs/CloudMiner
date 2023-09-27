@@ -13,6 +13,10 @@ from scripts_executor import PowershellScriptExecutor, PythonScriptExecutor
 def get_access_token() -> str:
     """
     Retrieve Azure access token using Azure CLI
+
+    :raises CloudMinerException: If Azure CLI is not installed or not in PATH
+                                 If account is not logged in via Azure CLI
+                                 If failed to retrieve account access token
     """
     logger.debug("Retrieving access token using Azure CLI...")
     try:
@@ -33,10 +37,10 @@ def get_access_token() -> str:
                                  stderr=subprocess.PIPE)
         
         if process.returncode != 0:
-            raise CloudMinerException(f"Failed to get access token using Azure CLI. Error - {process.stderr}")
+            raise CloudMinerException(f"Failed to retrieve access token using Azure CLI. Error - {process.stderr}")
          
     except FileNotFoundError:
-        raise CloudMinerException("Azure CLI is not installed on the system or not in PATH.")
+        raise CloudMinerException("Azure CLI is not installed on the system or not in PATH")
 
     return json.loads(process.stdout)["accessToken"]
     
