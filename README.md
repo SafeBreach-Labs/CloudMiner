@@ -8,6 +8,8 @@ CloudMiner is a tool designed to get free computing power within Azure Automatio
 
 * Each execution is limited to 3 hours
 
+* Executing Python scripts reqire a clean Automation Account. PowerShell scripts do not.
+
 ## Requirements
 1. Python 3.8+ with the libraries mentioned in the file `requirements.txt`
 2. Configured Azure CLI - https://learn.microsoft.com/en-us/cli/azure/install-azure-cli
@@ -34,6 +36,9 @@ optional arguments:
                         Azure access token
   -v, --verbose         Enable verbose mode
 ```
+
+### Example usage
+![Alt text](cloud-miner-usage.png?raw=true "Usage Example")
 
 ## License
 CloudMiner is released under the BSD 3-Clause License.

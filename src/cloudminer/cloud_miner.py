@@ -10,11 +10,12 @@ from cloudminer import CloudMinerException
 from azure_automation_session import AzureAutomationSession
 from scripts_executor import PowershellScriptExecutor, PythonScriptExecutor
 
+
 def get_access_token() -> str:
     """
     Retrieve Azure access token using Azure CLI
 
-    :raises CloudMinerException: If Azure CLI is not installed or not in PATH
+    :raises CloudMinerException: If Azure CLI is not installed or not in PATH environment variable
                                  If account is not logged in via Azure CLI
                                  If failed to retrieve account access token
     """
@@ -40,19 +41,26 @@ def get_access_token() -> str:
             raise CloudMinerException(f"Failed to retrieve access token using Azure CLI. Error - {process.stderr}")
          
     except FileNotFoundError:
-        raise CloudMinerException("Azure CLI is not installed on the system or not in PATH")
+        raise CloudMinerException("Azure CLI is not installed on the system or not in PATH environment variable")
 
     return json.loads(process.stdout)["accessToken"]
     
 
-def main():
+def parse_args() -> argparse.Namespace:
+    """
+    Parse command line arguments
+    """
     parser = argparse.ArgumentParser(description="CloudMiner - Free computing power in Azure Automation Service")
     parser.add_argument("--path", type=str, help="the script path (Powershell or Python)", required=True)
     parser.add_argument("--id", type=str, help="id of the Automation Account - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}", required=True)
     parser.add_argument("-c","--count", type=int, help="number of executions", required=True)
     parser.add_argument("-t","--token", type=int, help="Azure access token (optional). If not provided, token will be retrieved using the Azure CLI")
     parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose mode')
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
     
     level = logging.DEBUG if args.verbose else logging.INFO
     logger.setLevel(level)
@@ -73,24 +81,23 @@ def main():
     if not os.path.exists(args.path):
         raise CloudMinerException(f"Script path '{args.path}' does not exist!")
     
+    access_token = args.token or get_access_token()
+    automation_session = AzureAutomationSession(args.id, access_token)
+
     logger.debug(f"Script path - {args.path}")
     file_extension = file_utils.get_file_extension(args.path)
     if file_extension == PowershellScriptExecutor.EXTENSION:
-        ScriptExecutor = PowershellScriptExecutor
+        executor = PowershellScriptExecutor(automation_session)
 
     elif file_extension == PythonScriptExecutor.EXTENSION:
-        ScriptExecutor = PythonScriptExecutor
+        executor = PythonScriptExecutor(automation_session)
 
     else:
         raise CloudMinerException(f"File extension {file_extension} is not supported")
 
-    logger.info(f"File type detected - {ScriptExecutor.NAME}")
-    access_token = args.token or get_access_token()
-    automation_session = AzureAutomationSession(args.id, access_token)
-
-    executor = ScriptExecutor(automation_session)
-    executor.execute_script(args.path, args.count)
+    logger.info(f"File type detected - {executor.NAME}")
     
+    executor.execute_script(args.path, args.count)
     logger.info("CloudMiner finished successfully :)")
 
 if __name__ == "__main__":

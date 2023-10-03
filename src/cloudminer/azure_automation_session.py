@@ -2,6 +2,7 @@ import time
 import requests
 from http import HTTPStatus
 from requests.exceptions import ReadTimeout, ChunkedEncodingError
+from dataclasses import dataclass
 
 from logger import LoggerIndent, logger
 from cloudminer import CloudMinerException
@@ -12,6 +13,7 @@ UPLOAD_TIMEOUT = 300
 SLEEP_BETWEEN_ERROR_SECONDS = 10
 TIME_BETWEEN_REQUESTS_SECONDS = 0.5
 
+@dataclass
 class UPLOAD_STATE:
     """
     Package/Module upload state
@@ -46,12 +48,11 @@ class AzureAutomationSession:
         except requests.HTTPError as e:
             if e.response.status_code == HTTPStatus.UNAUTHORIZED:
                 raise CloudMinerException(f"Access token provided is not valid") from e
-            elif e.response.status_code == HTTPStatus.BAD_REQUEST:
+            if e.response.status_code == HTTPStatus.BAD_REQUEST:
                 raise CloudMinerException(f"Automation Account ID provided is not valid") from e
-            elif e.response.status_code == HTTPStatus.NOT_FOUND:
+            if e.response.status_code == HTTPStatus.NOT_FOUND:
                 raise CloudMinerException(f"Automation Account does not exists - '{account_id}'") from e
-            else:
-                raise
+            raise
 
     def _wait_for_next_request(self):
         """
@@ -88,11 +89,11 @@ class AzureAutomationSession:
             headers["Authorization"] = f"Bearer {self.access_token}"
         
         with LoggerIndent(logger):
-            while retries:
+            for _ in range(retries):
                 resp = None
                 try:
                     resp = requests.request(http_method, url, headers=headers, timeout=5, **kwargs)
-                except (ReadTimeout, ChunkedEncodingError):
+                except (ReadTimeout, ChunkedEncodingError): # Bad response from server
                     pass
                 
                 if resp is None or resp.status_code in [HTTPStatus.TOO_MANY_REQUESTS, 
@@ -101,12 +102,11 @@ class AzureAutomationSession:
                     
                     logger.warning(f"Too many requests. Retrying in {SLEEP_BETWEEN_ERROR_SECONDS} seconds...")
                     time.sleep(SLEEP_BETWEEN_ERROR_SECONDS)
-                    retries -= 1
                 else:
-                    break
+                    resp.raise_for_status()
+                    return resp
 
-        resp.raise_for_status()
-        return resp
+        
     
     def upload_file_to_temp_storage(self, file_path: str) -> str:
         """

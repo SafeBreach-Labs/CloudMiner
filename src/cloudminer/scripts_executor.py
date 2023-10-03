@@ -15,11 +15,20 @@ class ScriptExecutor(ABC):
     NAME: str
 
     def __init__(self, automation_session: AzureAutomationSession) -> None:
+        """
+        :param automation_session: Automation account session to 
+        """
         super().__init__()
         self.automation_session = automation_session
 
     @abstractmethod
     def execute_script(script_path: str, count: int):
+        """
+        Executes a script within Azure Automation
+
+        :param script_path: Script path to execute
+        :param count: Number of executions
+        """
         pass
 
 
@@ -34,6 +43,9 @@ class PowershellScriptExecutor(ScriptExecutor):
     def execute_script(self, script_path: str, count: int):
         """
         Executes Powershell script within Azure Automation
+
+        :param script_path: Powershell script path to execute
+        :param count: Number of executions
         """
         logger.info(f"Attempting to execute the Powershell script {count} times:")
         for index in range(count):
@@ -51,7 +63,7 @@ class PythonScriptExecutor(ScriptExecutor):
     EXTENSION = ".py"
     NAME = "Python"
     PIP_PACKAGE_NAME = "pip"
-    UPLOAD_STATE_CHECK_INTERVAL_SECONDS = 15
+    UPLOAD_STATE_CHECK_INTERVAL_SECONDS = 20
 
     def __init__(self, automation_session: AzureAutomationSession) -> None:
         super().__init__(automation_session)
@@ -90,6 +102,9 @@ class PythonScriptExecutor(ScriptExecutor):
     def execute_script(self, script_path: str, count: int):
         """
         Executes Python script within Azure Automation
+
+        :param script_path: Python script path to execute
+        :param count: Number of executions
         """
         package_path = os.path.join(file_utils.ROOT_DIRECTORY, "resources", PythonScriptExecutor.PIP_PACKAGE_NAME)
         main_file_path = os.path.join(package_path, "src", PythonScriptExecutor.PIP_PACKAGE_NAME, "main.py")
