@@ -54,7 +54,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--path", type=str, help="the script path (Powershell or Python)", required=True)
     parser.add_argument("--id", type=str, help="id of the Automation Account - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}", required=True)
     parser.add_argument("-c","--count", type=int, help="number of executions", required=True)
-    parser.add_argument("-t","--token", type=int, help="Azure access token (optional). If not provided, token will be retrieved using the Azure CLI")
+    parser.add_argument("-t","--token", type=str, help="Azure access token (optional). If not provided, token will be retrieved using the Azure CLI")
     parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose mode')
     return parser.parse_args()
 
