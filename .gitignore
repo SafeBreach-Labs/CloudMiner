@@ -5,4 +5,5 @@ __pycache__
 **build**
 **egg-info**
 resources/pip/src/*
+!resources/README.md
 !resources/pip/src/pip/__init__.py
