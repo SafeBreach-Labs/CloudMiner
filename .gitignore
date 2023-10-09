@@ -4,4 +4,5 @@ __pycache__
 **dist**
 **build**
 **egg-info**
-resources/pip/src/pip/main.py
+resources/pip/src/*
+!resources/pip/src/pip/__init__.py

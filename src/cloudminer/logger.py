@@ -3,9 +3,9 @@ import logging
 
 INDENT_CHAR = "\t"
 
-class CloudMinerLogger(logging.Logger):
+class CloudMinerlogger(logging.Logger):
     """
-    The main program logger
+    The main program logging
     """
     def __init__(self, name: str, level: int = 0) -> None:
         super().__init__(name, level)
@@ -31,26 +31,12 @@ class CloudMinerLogger(logging.Logger):
 
     def remove_indent(self):
         self.indent -= 1
-    
-
-class LoggerIndent():
-    """
-    Class to adjust indentation of the logger
-    """
-    def __init__(self, logger: CloudMinerLogger) -> None:
-        self.logger = logger
-
-    def __enter__(self):
-        self.logger.add_indent()
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.logger.remove_indent()
 
 
-def init_logger() -> CloudMinerLogger:
-    logger = CloudMinerLogger("root")
+def init_logging() -> CloudMinerlogger:
+    logger = CloudMinerlogger("root")
     handler = logging.StreamHandler(sys.stdout)
     logger.addHandler(handler)
     return logger
 
-logger = init_logger()
+logger = init_logging()

@@ -8,8 +8,6 @@ CloudMiner is a tool designed to get free computing power within Azure Automatio
 
 * Each execution is limited to 3 hours
 
-* Executing Python scripts reqire a clean Automation Account. PowerShell scripts do not.
-
 ## Requirements
 1. Python 3.8+ with the libraries mentioned in the file `requirements.txt`
 2. Configured Azure CLI - https://learn.microsoft.com/en-us/cli/azure/install-azure-cli
@@ -20,25 +18,29 @@ CloudMiner is a tool designed to get free computing power within Azure Automatio
 
 ## Usage
 ```
--- CloudMiner: v1.0.0 (SafeBreach Labs) --
-
-usage: cloud_miner.py [-h] --path PATH --id ID -c COUNT [-t TOKEN] [-v]
+usage: cloud_miner.py [-h] --path PATH --id ID -c COUNT [-t TOKEN] [-r REQUIREMENTS] [-v]
 
 CloudMiner - Free computing power in Azure Automation Service
 
 optional arguments:
   -h, --help            show this help message and exit
   --path PATH           the script path (Powershell or Python)
-  --id ID               id of the Automation Account - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}
+  --id ID               id of the Automation Account - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/a
+                        utomationAccounts/{automationAccountName}
   -c COUNT, --count COUNT
                         number of executions
   -t TOKEN, --token TOKEN
-                        Azure access token
+                        Azure access token (optional). If not provided, token will be retrieved using the Azure CLI
+  -r REQUIREMENTS, --requirements REQUIREMENTS
+                        Path to requirements file to be installed and use by the script (relevant to Python scripts only)
   -v, --verbose         Enable verbose mode
 ```
 
-### Example usage
-![Alt text](cloud-miner-usage.png?raw=true "Usage Example")
+## Example usage
+### Python
+![Alt text](images/cloud-miner-usage-python.png?raw=true "Usage Example")
+### Powershell
+![Alt text](images/cloud-miner-usage-powershell.png?raw=true "Usage Example")
 
 ## License
 CloudMiner is released under the BSD 3-Clause License.

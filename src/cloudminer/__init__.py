@@ -1,2 +1,0 @@
-class CloudMinerException(Exception):
-    pass
